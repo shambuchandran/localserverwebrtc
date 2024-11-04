@@ -52,7 +52,8 @@ websocket.on('request', (req) => {
                         userToReceiverOffer.conn.send(JSON.stringify({
                             type: "offer_received",
                             name: data.name,
-                            data: data.data.sdp
+                            data: data.data.sdp,
+                            isAudioOnly: data.isAudioOnly
                         }))
                     }
                 break
@@ -63,7 +64,8 @@ websocket.on('request', (req) => {
                         userToReceiverAnswer.conn.send(JSON.stringify({
                             type: "answer_received",
                             name: data.name,
-                            data: data.data.sdp
+                            data: data.data.sdp,
+                            isAudioOnly: data.isAudioOnly
                         }))
                     }
                 break  
@@ -78,7 +80,8 @@ websocket.on('request', (req) => {
                                 sdpMLineIndex:data.data.sdpMLineIndex,
                                 sdpMid:data.data.sdpMid,
                                 sdpCandidate:data.data.sdpCandidate
-                            }
+                            },
+                            isAudioOnly: data.isAudioOnly
                         }))
                     }
 
