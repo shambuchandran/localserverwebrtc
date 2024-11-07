@@ -1,8 +1,9 @@
 const http = require("http")
+const { type } = require("os")
 const Socket = require("websocket").server
+const port = process.env.PORT || 3000;
 const server = http.createServer(() => { })
-
-server.listen(3000, () => {
+server.listen(port,'0.0.0.0', () => {
     console.log("server started on port 3000")
 })
 
@@ -46,48 +47,55 @@ websocket.on('request', (req) => {
                 }
                 break
 
-                case "create_offer":
-                    let userToReceiverOffer= findUser(data.target)
-                    if(userToReceiverOffer){
-                        userToReceiverOffer.conn.send(JSON.stringify({
-                            type: "offer_received",
-                            name: data.name,
-                            data: data.data.sdp,
-                            isAudioOnly: data.isAudioOnly
-                        }))
-                    }
+            case "create_offer":
+                let userToReceiverOffer = findUser(data.target)
+                if (userToReceiverOffer) {
+                    userToReceiverOffer.conn.send(JSON.stringify({
+                        type: "offer_received",
+                        name: data.name,
+                        data: data.data.sdp,
+                        isAudioOnly: data.isAudioOnly
+                    }))
+                }
                 break
 
-                case "create_answer":
-                    let userToReceiverAnswer= findUser(data.target)
-                    if(userToReceiverAnswer){
-                        userToReceiverAnswer.conn.send(JSON.stringify({
-                            type: "answer_received",
-                            name: data.name,
-                            data: data.data.sdp,
-                            isAudioOnly: data.isAudioOnly
-                        }))
-                    }
-                break  
-                
-                case "ice_candidate":
-                    let userToReceiverIceCandidate=findUser(data.target)
-                    if(userToReceiverIceCandidate){
-                        userToReceiverIceCandidate.conn.send(JSON.stringify({
-                            type: "ice_candidate",
-                            name: data.name,
-                            data:{
-                                sdpMLineIndex:data.data.sdpMLineIndex,
-                                sdpMid:data.data.sdpMid,
-                                sdpCandidate:data.data.sdpCandidate
-                            },
-                            isAudioOnly: data.isAudioOnly
-                        }))
-                    }
-
+            case "create_answer":
+                let userToReceiverAnswer = findUser(data.target)
+                if (userToReceiverAnswer) {
+                    userToReceiverAnswer.conn.send(JSON.stringify({
+                        type: "answer_received",
+                        name: data.name,
+                        data: data.data.sdp,
+                        isAudioOnly: data.isAudioOnly
+                    }))
+                }
                 break
 
+            case "ice_candidate":
+                let userToReceiverIceCandidate = findUser(data.target)
+                if (userToReceiverIceCandidate) {
+                    userToReceiverIceCandidate.conn.send(JSON.stringify({
+                        type: "ice_candidate",
+                        name: data.name,
+                        data: {
+                            sdpMLineIndex: data.data.sdpMLineIndex,
+                            sdpMid: data.data.sdpMid,
+                            sdpCandidate: data.data.sdpCandidate
+                        },
+                        isAudioOnly: data.isAudioOnly
+                    }))
+                }
 
+                break
+            case "end_call":
+                let userToNotifyEndCall = findUser(data.target)
+                if (userToNotifyEndCall) {
+                    userToNotifyEndCall.conn.send(JSON.stringify({
+                        type: "call_ended",
+                        name: data.name
+                    }))
+                }
+                break
         }
     })
 
